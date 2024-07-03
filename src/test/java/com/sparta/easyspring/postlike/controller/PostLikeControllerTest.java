@@ -7,7 +7,7 @@ import com.sparta.easyspring.auth.security.UserDetailsImpl;
 import com.sparta.easyspring.auth.security.UserDetailsServiceImpl;
 import com.sparta.easyspring.auth.util.JwtUtil;
 import com.sparta.easyspring.config.MockTestDataSetup;
-import com.sparta.easyspring.postlike.repository.PostLikeRepository;
+import com.sparta.easyspring.postlike.repository.inf.PostLikeRepositoryInterface;
 import com.sparta.easyspring.postlike.service.PostLikeService;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
@@ -52,7 +52,7 @@ class PostLikeControllerTest {
     PostLikeService postLikeService;
 
     @MockBean
-    PostLikeRepository postLikeRepository;
+    PostLikeRepositoryInterface postLikeRepositoryInterface;
 
     @MockBean
     UserDetailsServiceImpl userDetailsServiceImpl;
