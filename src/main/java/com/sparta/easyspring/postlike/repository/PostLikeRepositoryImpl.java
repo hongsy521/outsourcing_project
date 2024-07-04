@@ -54,4 +54,13 @@ public class PostLikeRepositoryImpl implements PostLikeRepositoryCustom {
                 .where(postLike.user.id.eq(userId))
                 .fetch();
     }
+    @Override
+    public Long getLikeCountByUser(Long userId){
+        QPostLike postLike = QPostLike.postLike;
+
+        return jpaQueryFactory.select(postLike.count())
+                .from(postLike)
+                .where(postLike.user.id.eq(userId))
+                .fetchCount();
+    }
 }

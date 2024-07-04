@@ -12,4 +12,5 @@ public interface PostLikeRepositoryCustom {
     int likePost(Long userId, Long postId);
     Long unlikePost(Long userId, Long postId);
     List<Long> getAllLikeByUser(Long userId);
+    Long getLikeCountByUser(Long userId);
 }

@@ -56,4 +56,13 @@ public class CommentLikeRepositoryImpl implements CommentLikeRepositoryCustom {
                 .where(commentLike.user.id.eq(userId))
                 .fetch();
     }
+    @Override
+    public Long getLikeCountByUser(Long userId){
+        QCommentLike commentLike = QCommentLike.commentLike;
+
+        return jpaQueryFactory.select(commentLike.count())
+                .from(commentLike)
+                .where(commentLike.user.id.eq(userId))
+                .fetchCount();
+    }
 }

@@ -14,11 +14,14 @@ import com.sparta.easyspring.auth.repository.PasswordHistoryRepository;
 import com.sparta.easyspring.auth.repository.UserRepository;
 import com.sparta.easyspring.auth.security.UserDetailsImpl;
 import com.sparta.easyspring.auth.util.JwtUtil;
+import com.sparta.easyspring.commentlike.repository.CommentLikeRepository;
 import com.sparta.easyspring.exception.CustomException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+
+import com.sparta.easyspring.postlike.repository.PostLikeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -38,6 +41,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final JwtUtil jwtUtil;
+    private final PostLikeRepository postLikeRepository;
+    private final CommentLikeRepository commentLikeRepository;
 
     private final String USERID_REGEX = "^[a-z0-9]{4,10}$";
     private final String USERPASSWORD_REGEX = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()_+\\-=\\[\\]{}|;:'\",.<>/?]).{8,15}$";
@@ -206,8 +211,11 @@ public class UserService {
         headers.set("Authorization", "Bearer " + accessToken);
         headers.set("Refresh-Token", refreshToken);
 
+        Long postLikeCount = postLikeRepository.getLikeCountByUser(user.getId());
+        Long commentLikeCount = commentLikeRepository.getLikeCountByUser(user.getId());
+
         ProfileResponseDto responseDto = new ProfileResponseDto(user.getId(), user.getUsername(),
-            user.getIntroduction());
+            user.getIntroduction(),postLikeCount,commentLikeCount);
 
         return new ResponseEntity<>(responseDto, headers, HttpStatus.OK);
     }
@@ -250,7 +258,10 @@ public class UserService {
         String username = user.getUsername();
         String introduction = user.getIntroduction();
 
-        ProfileResponseDto responseDto = new ProfileResponseDto(userId, username, introduction);
+        Long postLikeCount = postLikeRepository.getLikeCountByUser(userId);
+        Long commentLikeCount = commentLikeRepository.getLikeCountByUser(userId);
+
+        ProfileResponseDto responseDto = new ProfileResponseDto(userId, username, introduction,postLikeCount,commentLikeCount);
 
         return ResponseEntity.ok().body(responseDto);
     }
@@ -267,8 +278,10 @@ public class UserService {
             Long userid = user.getId();
             String username = user.getUsername();
             String introduction = user.getIntroduction();
+            Long postLikeCount = postLikeRepository.getLikeCountByUser(userid);
+            Long commentLikeCount = commentLikeRepository.getLikeCountByUser(userid);
 
-            responseDtoList.add(new ProfileResponseDto(userid, username, introduction));
+            responseDtoList.add(new ProfileResponseDto(userid, username, introduction,postLikeCount,commentLikeCount));
         }
 
         return ResponseEntity.ok().body(responseDtoList);

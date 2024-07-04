@@ -12,4 +12,5 @@ public interface CommentLikeRepositoryCustom {
     int likeComment(Long userId, Long commentId);
     Long unlikeComment(Long userId, Long commentId);
     List<Long> getAllLikeByUser(Long userId);
+    Long getLikeCountByUser(Long userId);
 }
