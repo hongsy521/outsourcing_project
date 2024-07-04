@@ -7,6 +7,7 @@ import com.sparta.easyspring.follow.entity.Follow;
 import com.sparta.easyspring.follow.repository.FollowRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.sparta.easyspring.exception.ErrorEnum.*;
 
@@ -16,7 +17,8 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserService userService;
 
-    public void addFollow(Long followingId, User user) {
+    @Transactional
+    public String addFollow(Long followingId, User user) {
         User followingUser = userService.findUserById(followingId);
         if(followingId.equals(user.getId())){
             throw new CustomException(INCORRECT_SELF_FOLLOW);
@@ -25,17 +27,25 @@ public class FollowService {
         if(checkFollow != null){
             throw new CustomException(ALREADY_FOLLOW);
         }
-        Follow follow = new Follow(followingUser,user);
-        followRepository.save(follow);
+        long followRow = followRepository.followUser(followingId,user);
+        if(followRow!=1){
+            throw new IllegalArgumentException();
+        }
+        return "팔로우 등록 성공";
     }
 
-    public void deleteFollow(Long followingId, User user) {
+    @Transactional
+    public String deleteFollow(Long followingId, User user) {
         User followingUser = userService.findUserById(followingId);
         Follow checkFollow = findFollowById(followingUser.getId(),user);
         if(checkFollow == null){
             throw new CustomException(NON_EXISTENT_ELEMENT);
         }
-        followRepository.delete(checkFollow);
+        long unfollowRow = followRepository.unfollowUser(followingId,user);
+        if(unfollowRow!=1){
+            throw new IllegalArgumentException();
+        }
+        return "팔로우 취소 성공";
     }
 
     public Follow findFollowById(Long followingId, User user){
