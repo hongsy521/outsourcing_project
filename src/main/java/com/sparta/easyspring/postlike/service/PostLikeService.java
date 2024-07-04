@@ -31,15 +31,15 @@ public class PostLikeService {
 
         Optional<PostLike> postLike = postLikeRepository.findByUserAndPost(user.getId(),post.getId());
 
-        if(postLike!=null){
+        postLike.ifPresent(postLike1 -> {
             throw new CustomException(DUPLICATE_LIKE);
-        }
+        });
 
         if (post.getUser().getId() == userId) {
             throw new CustomException(CANNOT_LIKE_OWN_CONTENT);
         }
 
-        Long rowCount = postLikeRepository.likePost(user.getId(),post.getId());
+        int rowCount = postLikeRepository.likePost(user.getId(),post.getId());
         if(rowCount==1){
             postService.increaseLikes(postId);
         }
@@ -57,7 +57,7 @@ public class PostLikeService {
         );
         Long rowCount = postLikeRepository.unlikePost(user.getId(),post.getId());
 
-        if(rowCount==0){
+        if(rowCount==1){
             postService.decreaseLikes(postId);
         }
 

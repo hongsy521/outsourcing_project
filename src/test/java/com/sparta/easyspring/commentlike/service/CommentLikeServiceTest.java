@@ -5,7 +5,7 @@ import com.sparta.easyspring.auth.service.UserService;
 import com.sparta.easyspring.comment.entity.Comment;
 import com.sparta.easyspring.comment.service.CommentService;
 import com.sparta.easyspring.commentlike.entity.CommentLike;
-import com.sparta.easyspring.commentlike.repository.CommentLikeRepository;
+import com.sparta.easyspring.commentlike.repository.inf.CommentLikeRepositoryInterface;
 import com.sparta.easyspring.exception.CustomException;
 import com.sparta.easyspring.exception.ErrorEnum;
 import com.sparta.easyspring.post.entity.Post;
@@ -29,7 +29,7 @@ import static org.mockito.Mockito.doNothing;
 @ExtendWith(MockitoExtension.class)
 class CommentLikeServiceTest {
     @Mock
-    CommentLikeRepository commentLikeRepository;
+    CommentLikeRepositoryInterface commentLikeRepository;
 
     @Mock
     CommentService commentService;

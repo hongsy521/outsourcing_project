@@ -1,15 +1,14 @@
 package com.sparta.easyspring.postlike.repository.impl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.sparta.easyspring.auth.entity.User;
-import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.postlike.entity.PostLike;
 import com.sparta.easyspring.postlike.entity.QPostLike;
 import com.sparta.easyspring.postlike.repository.inf.PostLikeRepositoryInterface;
+import jakarta.persistence.EntityManager;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,11 +16,13 @@ public class PostLikeRepository extends QuerydslRepositorySupport {
 
     private final PostLikeRepositoryInterface postLikeRepositoryInterface;
     private final JPAQueryFactory jpaQueryFactory;
+    private final EntityManager entityManager;
 
-    public PostLikeRepository(PostLikeRepositoryInterface postLikeRepositoryInterface, JPAQueryFactory jpaQueryFactory) {
+    public PostLikeRepository(PostLikeRepositoryInterface postLikeRepositoryInterface, JPAQueryFactory jpaQueryFactory,EntityManager entityManager) {
         super(PostLike.class);
         this.postLikeRepositoryInterface = postLikeRepositoryInterface;
         this.jpaQueryFactory = jpaQueryFactory;
+        this.entityManager=entityManager;
     }
 
     public Optional<PostLike> findByUserAndPost(Long userId, Long postId){
@@ -34,20 +35,18 @@ public class PostLikeRepository extends QuerydslRepositorySupport {
         return Optional.ofNullable(result);
     }
 
-    public Long likePost(Long userId, Long postId){
+    public int likePost(Long userId, Long postId){
         QPostLike postLike = QPostLike.postLike;
 
-        // 삽입된 행의 수 반환
-        return jpaQueryFactory.insert(postLike)
-                .set(postLike.user.id,userId)
-                .set(postLike.post.id,postId)
-                .execute();
+        return entityManager.createNativeQuery("INSERT INTO postlikes (post_id,user_id) VALUES (?,?)")
+                .setParameter(1,postId)
+                .setParameter(2,userId)
+                .executeUpdate();
     }
 
     public Long unlikePost(Long userId, Long postId){
         QPostLike postLike = QPostLike.postLike;
 
-        // 삽입된 행의 수 반환
         return jpaQueryFactory.delete(postLike)
                 .where(postLike.user.id.eq(userId),postLike.post.id.eq(postId))
                 .execute();

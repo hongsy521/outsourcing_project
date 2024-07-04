@@ -5,6 +5,7 @@ import com.sparta.easyspring.auth.repository.UserRepository;
 import com.sparta.easyspring.comment.entity.Comment;
 import com.sparta.easyspring.comment.repository.CommentRepository;
 import com.sparta.easyspring.commentlike.entity.CommentLike;
+import com.sparta.easyspring.commentlike.repository.inf.CommentLikeRepositoryInterface;
 import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.repository.PostRepository;
 import com.sparta.easyspring.config.MockTestDataSetup;
@@ -33,7 +34,7 @@ class CommentLikeRepositoryTest {
     CommentRepository commentRepository;
 
     @Autowired
-    CommentLikeRepository commentLikeRepository;
+    CommentLikeRepositoryInterface commentLikeRepository;
     @Test
     @DisplayName("성공: 포스트, 사용자로 좋아요한 포스트 찾기")
     void findByUserAndComment(){
