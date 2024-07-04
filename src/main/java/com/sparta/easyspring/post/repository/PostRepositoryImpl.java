@@ -3,6 +3,7 @@ package com.sparta.easyspring.post.repository;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.sparta.easyspring.auth.entity.User;
 import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.entity.QPost;
 import com.sparta.easyspring.postlike.entity.QPostLike;
@@ -36,5 +37,25 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .fetchCount();
 
         return new PageImpl<>(result,pageable,total);
+    }
+
+    @Override
+    public Page<Post> getAllPostByFollow(List<Long> followingIds, long offset, Pageable pageable){
+        QPost post = QPost.post;
+        OrderSpecifier<?> orderSpecifier = new OrderSpecifier<>(Order.DESC,post.createdAt);
+
+        List<Post> result = jpaQueryFactory.selectFrom(post)
+                .where(post.user.id.in(followingIds))
+                .offset(offset)
+                .limit(5)
+                .orderBy(orderSpecifier)
+                .fetch();
+
+        long total = jpaQueryFactory.selectFrom(post)
+                .where(post.user.id.in(followingIds))
+                .fetchCount();
+
+        return new PageImpl<>(result,pageable,total);
+
     }
 }

@@ -4,13 +4,13 @@ import com.sparta.easyspring.auth.entity.User;
 import com.sparta.easyspring.auth.service.UserService;
 import com.sparta.easyspring.exception.CustomException;
 import com.sparta.easyspring.follow.entity.Follow;
+import com.sparta.easyspring.follow.repository.FollowRepository;
 import com.sparta.easyspring.follow.service.FollowService;
 import com.sparta.easyspring.post.dto.PostRequestDto;
 import com.sparta.easyspring.post.dto.PostResponseDto;
 import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.repository.PostRepository;
 import com.sparta.easyspring.postlike.repository.PostLikeRepository;
-import com.sparta.easyspring.postlike.repository.PostLikeRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +19,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +31,7 @@ public class PostService {
     private final PostLikeRepository postLikeRepository;
     private final UserService userService;
     private final FollowService followService;
+    private final FollowRepository followRepository;
 
     public PostResponseDto addPost(PostRequestDto requestDto, User user) {
         Post post = new Post(requestDto,user);
@@ -70,7 +70,7 @@ public class PostService {
         }
         postRepository.delete(post);
     }
-    public List<PostResponseDto> getAllFollowPost(Long followingId, User user,int page, String sortBy){
+    public List<PostResponseDto> getFollowPost(Long followingId, User user,int page, String sortBy){
         User checkUser = userService.findUserById(followingId);
         Follow checkFollow = followService.findFollowById(checkUser.getId(),user);
         if(checkFollow==null){
@@ -124,5 +124,20 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return likePostList;
+    }
+
+    public List<PostResponseDto> getAllFollowPost(User user, int page){
+        List<Long> followingIds = followRepository.getFollowingId(user.getId());
+
+        Pageable pageable = PageRequest.of(page,5);
+
+        Page<Post> followPostPage = postRepository.getAllPostByFollow(followingIds,pageable.getOffset(),pageable);
+
+        List<PostResponseDto> followPostList = followPostPage
+                .stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return followPostList;
     }
 }

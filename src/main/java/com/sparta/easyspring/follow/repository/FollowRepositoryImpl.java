@@ -8,6 +8,8 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class FollowRepositoryImpl implements FollowRepositoryCustom{
@@ -38,5 +40,15 @@ public class FollowRepositoryImpl implements FollowRepositoryCustom{
         return jpaQueryFactory.delete(follow)
                 .where(follow.followingId.eq(followingId),follow.user.id.eq(user.getId()))
                 .execute();
+    }
+
+    @Override
+    public List<Long> getFollowingId(Long userId){
+        QFollow follow = QFollow.follow;
+
+        return jpaQueryFactory.select(follow.followingId)
+                .from(follow)
+                .where(follow.user.id.eq(userId))
+                .fetch();
     }
 }

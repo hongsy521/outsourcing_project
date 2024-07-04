@@ -56,12 +56,12 @@ public class PostController {
                 .body("삭제가 완료되었습니다.");
     }
     @GetMapping("/follow/{followingId}")
-    public ResponseEntity<List<PostResponseDto>> getAllFollowPost(@PathVariable(name = "followingId") Long followingId,
+    public ResponseEntity<List<PostResponseDto>> getFollowPost(@PathVariable(name = "followingId") Long followingId,
                                                                   @AuthenticationPrincipal UserDetailsImpl userDetails,
                                                                   @RequestParam(value = "page",defaultValue = "1") int page,
                                                                   @RequestParam(value = "sortBy",defaultValue = "createdAt") String sortBy){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(postService.getAllFollowPost(followingId,userDetails.getUser(),page-1,sortBy));
+                .body(postService.getFollowPost(followingId,userDetails.getUser(),page-1,sortBy));
     }
     @GetMapping("/like/{userId}")
     public ResponseEntity<List<PostResponseDto>> getAllLikePost(@PathVariable(name = "userId") Long userId,
@@ -70,5 +70,11 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(postService.getAllLikePost(userId,userDetails.getUser(),page-1));
 
+    }
+    @GetMapping("/follow")
+    public ResponseEntity<List<PostResponseDto>> getAllFollowPost(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                                  @RequestParam(value = "page",defaultValue = "1") int page){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(postService.getAllFollowPost(userDetails.getUser(),page-1));
     }
 }
