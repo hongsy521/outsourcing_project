@@ -6,7 +6,6 @@ import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.repository.PostRepository;
 import com.sparta.easyspring.config.MockTestDataSetup;
 import com.sparta.easyspring.postlike.entity.PostLike;
-import com.sparta.easyspring.postlike.repository.inf.PostLikeRepositoryInterface;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-class PostLikeRepositoryInterfaceTest {
+class PostLikeRepositoryImplInterfaceTest {
     @Autowired
     UserRepository userRepository;
 
@@ -27,7 +26,7 @@ class PostLikeRepositoryInterfaceTest {
     PostRepository postRepository;
 
     @Autowired
-    PostLikeRepositoryInterface postLikeRepositoryInterface;
+    PostLikeRepository postLikeRepository;
 
     @Test
     @DisplayName("성공: 포스트, 사용자로 좋아요한 포스트 찾기")
@@ -40,10 +39,10 @@ class PostLikeRepositoryInterfaceTest {
         postRepository.save(TEST_POST);
 
         PostLike TEST_POSTLIKE = new PostLike(TEST_USER, TEST_POST);
-        postLikeRepositoryInterface.save(TEST_POSTLIKE);
+        postLikeRepository.save(TEST_POSTLIKE);
 
         // when
-        PostLike resultPostLike = postLikeRepositoryInterface.findByUserAndPost(TEST_USER, TEST_POST);
+        PostLike resultPostLike = postLikeRepository.findByUserAndPost(TEST_USER, TEST_POST);
 
         // then
         assertThat(resultPostLike).isEqualTo(TEST_POSTLIKE);

@@ -7,7 +7,7 @@ import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.service.PostService;
 import com.sparta.easyspring.config.MockTestDataSetup;
 import com.sparta.easyspring.postlike.entity.PostLike;
-import com.sparta.easyspring.postlike.repository.inf.PostLikeRepositoryInterface;
+import com.sparta.easyspring.postlike.repository.PostLikeRepository;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -24,7 +24,7 @@ import static org.mockito.Mockito.doNothing;
 @ExtendWith(MockitoExtension.class)
 class PostLikeServiceTest {
     @Mock
-    PostLikeRepositoryInterface postLikeRepositoryInterface;
+    PostLikeRepository postLikeRepository;
 
     @Mock
     UserService userService;
@@ -60,8 +60,8 @@ class PostLikeServiceTest {
 
         given(userService.findUserById(TEST_USER_ID)).willReturn(TEST_USER);
         given(postService.findPostbyId(TEST_POST_ID)).willReturn(TEST_POST);
-        given(postLikeRepositoryInterface.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(null);
-        given(postLikeRepositoryInterface.save(any())).willReturn(null);
+        given(postLikeRepository.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(null);
+        given(postLikeRepository.save(any())).willReturn(null);
 
         // when
         String resultMsg = postLikeService.likePost(TEST_USER_ID, TEST_POST_ID);
@@ -83,7 +83,7 @@ class PostLikeServiceTest {
 
         given(userService.findUserById(TEST_USER_ID)).willReturn(TEST_USER);
         given(postService.findPostbyId(TEST_POST_ID)).willReturn(TEST_POST);
-        given(postLikeRepositoryInterface.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(TEST_POSTLIKE);
+        given(postLikeRepository.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(TEST_POSTLIKE);
 
         // when - then
         assertThrows(CustomException.class, () -> postLikeService.likePost(TEST_USER_ID, TEST_POST_ID));
@@ -103,7 +103,7 @@ class PostLikeServiceTest {
 
         given(userService.findUserById(TEST_USER_ID)).willReturn(TEST_USER);
         given(postService.findPostbyId(TEST_POST_ID)).willReturn(TEST_POST);
-        given(postLikeRepositoryInterface.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(null);
+        given(postLikeRepository.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(null);
 
         // when - then
         assertThrows(CustomException.class, () -> postLikeService.likePost(TEST_USER_ID, TEST_POST_ID));
@@ -124,8 +124,8 @@ class PostLikeServiceTest {
 
         given(userService.findUserById(TEST_USER_ID)).willReturn(TEST_USER);
         given(postService.findPostbyId(TEST_POST_ID)).willReturn(TEST_POST);
-        given(postLikeRepositoryInterface.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(TEST_POSTLIKE);
-        doNothing().when(postLikeRepositoryInterface).delete(TEST_POSTLIKE);
+        given(postLikeRepository.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(TEST_POSTLIKE);
+        doNothing().when(postLikeRepository).delete(TEST_POSTLIKE);
 
         // when
         String resultMsg = postLikeService.unlikePost(TEST_USER_ID, TEST_POST_ID);
@@ -147,7 +147,7 @@ class PostLikeServiceTest {
 
         given(userService.findUserById(TEST_USER_ID)).willReturn(TEST_USER);
         given(postService.findPostbyId(TEST_POST_ID)).willReturn(TEST_POST);
-        given(postLikeRepositoryInterface.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(null);
+        given(postLikeRepository.findByUserAndPost(TEST_USER, TEST_POST)).willReturn(null);
 
         // when - then
         assertThrows(CustomException.class, () -> postLikeService.unlikePost(TEST_USER_ID, TEST_POST_ID));
