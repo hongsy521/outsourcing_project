@@ -9,6 +9,7 @@ import com.sparta.easyspring.post.dto.PostRequestDto;
 import com.sparta.easyspring.post.dto.PostResponseDto;
 import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.repository.PostRepository;
+import com.sparta.easyspring.postlike.repository.PostLikeRepository;
 import com.sparta.easyspring.postlike.repository.PostLikeRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,6 +29,7 @@ import static com.sparta.easyspring.exception.ErrorEnum.*;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
     private final UserService userService;
     private final FollowService followService;
 
@@ -86,26 +88,6 @@ public class PostService {
         return followPostList;
     }
 
-    // 사용자가 좋아요한 게시글 목록 조회
-    public List<PostResponseDto> getAllLikePost(Long userId, User user, int page){
-        if(!user.getId().equals(userId)){
-            throw new CustomException(INCORRECT_USER);
-        }
-        // postlikerepository - 특정 사용자가 좋아요한 게시글 아이디 추출
-        List<Long> likePostIdList = postRepository.getAllLikeByUser(userId);
-
-        Pageable pageable = PageRequest.of(page,5);
-
-        // postrepository - 게시글 아이디를 통한 포스트 전체 조회
-        Page<Post> likePostPage = postRepository.getAllPostByLike(likePostIdList,pageable.getOffset(),pageable);
-
-        List<PostResponseDto> likePostList = likePostPage.stream()
-                .map(PostResponseDto::new)
-                .collect(Collectors.toList());
-
-        return likePostList;
-    }
-
     @Transactional
     public void increaseLikes(Long postId){
         Post post = findPostbyId(postId);
@@ -123,5 +105,24 @@ public class PostService {
                 ()->new CustomException(POST_NOT_FOUND)
         );
         return post;
+    }
+
+    public List<PostResponseDto> getAllLikePost(Long userId, User user, int page){
+        if(!user.getId().equals(userId)){
+            throw new CustomException(INCORRECT_USER);
+        }
+        // postLikeRepository - 특정 사용자가 좋아요한 게시글 아이디 추출
+        List<Long> likePostIdList = postLikeRepository.getAllLikeByUser(userId);
+
+        Pageable pageable = PageRequest.of(page,5);
+
+        // postRepository- 게시글 아이디를 통한 포스트 전체 조회
+        Page<Post> likePostPage = postRepository.getAllPostByLike(likePostIdList,pageable.getOffset(),pageable);
+
+        List<PostResponseDto> likePostList = likePostPage.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return likePostList;
     }
 }

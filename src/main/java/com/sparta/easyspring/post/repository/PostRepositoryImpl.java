@@ -37,12 +37,4 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
         return new PageImpl<>(result,pageable,total);
     }
-    public List<Long> getAllLikeByUser(Long userId) {
-        QPostLike postLike = QPostLike.postLike;
-
-        return jpaQueryFactory.select(postLike.post.id)
-                .from(postLike)
-                .where(postLike.user.id.eq(userId))
-                .fetch();
-    }
 }

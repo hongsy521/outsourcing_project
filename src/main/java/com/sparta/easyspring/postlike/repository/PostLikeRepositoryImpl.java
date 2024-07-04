@@ -7,6 +7,7 @@ import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -43,5 +44,14 @@ public class PostLikeRepositoryImpl implements PostLikeRepositoryCustom {
         return jpaQueryFactory.delete(postLike)
                 .where(postLike.user.id.eq(userId),postLike.post.id.eq(postId))
                 .execute();
+    }
+    @Override
+    public List<Long> getAllLikeByUser(Long userId) {
+        QPostLike postLike = QPostLike.postLike;
+
+        return jpaQueryFactory.select(postLike.post.id)
+                .from(postLike)
+                .where(postLike.user.id.eq(userId))
+                .fetch();
     }
 }

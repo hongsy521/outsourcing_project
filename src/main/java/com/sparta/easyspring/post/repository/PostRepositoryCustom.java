@@ -10,6 +10,4 @@ import java.util.List;
 @Repository
 public interface PostRepositoryCustom {
     Page<Post> getAllPostByLike(List<Long> postIds, long offset, Pageable pageable);
-
-    List<Long> getAllLikeByUser(Long userId);
 }
