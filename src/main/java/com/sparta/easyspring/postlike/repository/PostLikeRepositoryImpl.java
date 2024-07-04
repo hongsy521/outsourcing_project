@@ -1,30 +1,22 @@
-package com.sparta.easyspring.postlike.repository.impl;
+package com.sparta.easyspring.postlike.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.easyspring.postlike.entity.PostLike;
 import com.sparta.easyspring.postlike.entity.QPostLike;
-import com.sparta.easyspring.postlike.repository.inf.PostLikeRepositoryInterface;
 import jakarta.persistence.EntityManager;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Repository
-public class PostLikeRepository extends QuerydslRepositorySupport {
+@RequiredArgsConstructor
+public class PostLikeRepositoryImpl implements PostLikeRepositoryCustom {
 
-    private final PostLikeRepositoryInterface postLikeRepositoryInterface;
     private final JPAQueryFactory jpaQueryFactory;
     private final EntityManager entityManager;
 
-    public PostLikeRepository(PostLikeRepositoryInterface postLikeRepositoryInterface, JPAQueryFactory jpaQueryFactory,EntityManager entityManager) {
-        super(PostLike.class);
-        this.postLikeRepositoryInterface = postLikeRepositoryInterface;
-        this.jpaQueryFactory = jpaQueryFactory;
-        this.entityManager=entityManager;
-    }
-
+    @Override
     public Optional<PostLike> findByUserAndPost(Long userId, Long postId){
         QPostLike postLike = QPostLike.postLike;
 
@@ -35,8 +27,8 @@ public class PostLikeRepository extends QuerydslRepositorySupport {
         return Optional.ofNullable(result);
     }
 
+    @Override
     public int likePost(Long userId, Long postId){
-        QPostLike postLike = QPostLike.postLike;
 
         return entityManager.createNativeQuery("INSERT INTO postlikes (post_id,user_id) VALUES (?,?)")
                 .setParameter(1,postId)
@@ -44,6 +36,7 @@ public class PostLikeRepository extends QuerydslRepositorySupport {
                 .executeUpdate();
     }
 
+    @Override
     public Long unlikePost(Long userId, Long postId){
         QPostLike postLike = QPostLike.postLike;
 

@@ -9,6 +9,7 @@ import com.sparta.easyspring.post.dto.PostRequestDto;
 import com.sparta.easyspring.post.dto.PostResponseDto;
 import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.repository.PostRepository;
+import com.sparta.easyspring.postlike.repository.PostLikeRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -82,6 +84,26 @@ public class PostService {
                 .collect(Collectors.toList());
 
         return followPostList;
+    }
+
+    // 사용자가 좋아요한 게시글 목록 조회
+    public List<PostResponseDto> getAllLikePost(Long userId, User user, int page){
+        if(!user.getId().equals(userId)){
+            throw new CustomException(INCORRECT_USER);
+        }
+        // postlikerepository - 특정 사용자가 좋아요한 게시글 아이디 추출
+        List<Long> likePostIdList = postRepository.getAllLikeByUser(userId);
+
+        Pageable pageable = PageRequest.of(page,5);
+
+        // postrepository - 게시글 아이디를 통한 포스트 전체 조회
+        Page<Post> likePostPage = postRepository.getAllPostByLike(likePostIdList,pageable.getOffset(),pageable);
+
+        List<PostResponseDto> likePostList = likePostPage.stream()
+                .map(PostResponseDto::new)
+                .collect(Collectors.toList());
+
+        return likePostList;
     }
 
     @Transactional
