@@ -6,23 +6,32 @@ import com.sparta.easyspring.comment.dto.CommentRequestDto;
 import com.sparta.easyspring.comment.dto.CommentResponseDto;
 import com.sparta.easyspring.comment.entity.Comment;
 import com.sparta.easyspring.comment.repository.CommentRepository;
+import com.sparta.easyspring.commentlike.repository.CommentLikeRepository;
+import com.sparta.easyspring.commentlike.repository.CommentLikeRepositoryImpl;
 import com.sparta.easyspring.exception.CustomException;
 import com.sparta.easyspring.exception.ErrorEnum;
 import com.sparta.easyspring.post.entity.Post;
 import com.sparta.easyspring.post.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.sparta.easyspring.exception.ErrorEnum.INCORRECT_USER;
 
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
     private final PostService postService;
 
     public CommentResponseDto createNewComment(Long postId, CommentRequestDto requestDto) {
@@ -93,5 +102,22 @@ public class CommentService {
     public void decreaseLikes(Long commentId){
         Comment comment = findCommentbyId(commentId);
         comment.decreaseLikes();
+    }
+
+    public List<CommentResponseDto> getAllLikeComment(Long userId, User user, int page) {
+        if(!user.getId().equals(userId)){
+            throw new CustomException(INCORRECT_USER);
+        }
+        List<Long> likeCommentIdList = commentLikeRepository.getAllLikeByUser(userId);
+
+        Pageable pageable = PageRequest.of(page,5);
+
+        Page<Comment> likeCommentPage = commentRepository.getAllCommentByLike(likeCommentIdList,pageable.getOffset(),pageable);
+
+        List<CommentResponseDto> likeCommentList = likeCommentPage.stream()
+                .map(CommentResponseDto::new)
+                .collect(Collectors.toList());
+
+        return likeCommentList;
     }
 }

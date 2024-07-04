@@ -10,8 +10,8 @@ import com.sparta.easyspring.comment.entity.Comment;
 import com.sparta.easyspring.commentlike.entity.CommentLike;
 
 import com.sparta.easyspring.comment.service.CommentService;
-import com.sparta.easyspring.commentlike.repository.impl.CommentLikeRepository;
-import com.sparta.easyspring.commentlike.repository.inf.CommentLikeRepositoryInterface;
+import com.sparta.easyspring.commentlike.repository.CommentLikeRepository;
+import com.sparta.easyspring.commentlike.repository.CommentLikeRepositoryImpl;
 import com.sparta.easyspring.exception.CustomException;
 import com.sparta.easyspring.exception.ErrorEnum;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,6 @@ public class CommentLikeService {
 
     private final CommentService commentService;
     private final UserService userService;
-    // private final CommentLikeRepositoryInterface commentLikeRepositoryInterface;
     private final CommentLikeRepository commentLikeRepository;
 
     @Transactional
@@ -37,7 +36,7 @@ public class CommentLikeService {
         User user = userService.findUserById(userId);
         Comment comment = commentService.findCommentbyId(commentId);
 
-        Optional<CommentLike> commentLike = commentLikeRepository.findByUserAndComment(user.getId(),comment.getId());
+        Optional<CommentLike> commentLike = commentLikeRepository.getByUserAndComment(user.getId(),comment.getId());
 
         commentLike.ifPresent(commentLike1 -> {
             throw new CustomException(ErrorEnum.DUPLICATE_LIKE);
@@ -62,7 +61,7 @@ public class CommentLikeService {
         User user = userService.findUserById(userId);
         Comment comment = commentService.findCommentbyId(commentId);
 
-        commentLikeRepository.findByUserAndComment(user.getId(),comment.getId()).orElseThrow(
+        commentLikeRepository.getByUserAndComment(user.getId(),comment.getId()).orElseThrow(
                 ()->  new CustomException(ErrorEnum.LIKE_NOT_FOUND));
 
         Long rowCount = commentLikeRepository.unlikeComment(user.getId(),comment.getId());

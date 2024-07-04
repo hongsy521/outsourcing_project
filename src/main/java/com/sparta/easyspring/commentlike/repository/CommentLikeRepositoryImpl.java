@@ -1,30 +1,24 @@
-package com.sparta.easyspring.commentlike.repository.impl;
+package com.sparta.easyspring.commentlike.repository;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.sparta.easyspring.commentlike.entity.CommentLike;
 import com.sparta.easyspring.commentlike.entity.QCommentLike;
-import com.sparta.easyspring.commentlike.repository.inf.CommentLikeRepositoryInterface;
 import jakarta.persistence.EntityManager;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class CommentLikeRepository extends QuerydslRepositorySupport {
-    private final CommentLikeRepositoryInterface commentLikeRepositoryInterface;
+@RequiredArgsConstructor
+public class CommentLikeRepositoryImpl implements CommentLikeRepositoryCustom {
+
     private final JPAQueryFactory jpaQueryFactory;
     private final EntityManager entityManager;
 
-    public CommentLikeRepository(CommentLikeRepositoryInterface commentLikeRepositoryInterface, JPAQueryFactory jpaQueryFactory,EntityManager entityManager) {
-        super(CommentLike.class);
-        this.commentLikeRepositoryInterface = commentLikeRepositoryInterface;
-        this.jpaQueryFactory = jpaQueryFactory;
-        this.entityManager=entityManager;
-    }
-
-    public Optional<CommentLike> findByUserAndComment(Long userId, Long commentId){
+    @Override
+    public Optional<CommentLike> getByUserAndComment(Long userId, Long commentId){
         QCommentLike commentLike = QCommentLike.commentLike;
 
         CommentLike result = jpaQueryFactory.selectFrom(commentLike)
@@ -34,6 +28,7 @@ public class CommentLikeRepository extends QuerydslRepositorySupport {
         return Optional.ofNullable(result);
     }
 
+    @Override
     public int likeComment(Long userId, Long commentId){
         QCommentLike commentLike = QCommentLike.commentLike;
 
@@ -43,11 +38,22 @@ public class CommentLikeRepository extends QuerydslRepositorySupport {
                 .executeUpdate();  // 쿼리에 의해 영형을 받은 행의 수
     }
 
+    @Override
     public Long unlikeComment(Long userId, Long commentId){
         QCommentLike commentLike = QCommentLike.commentLike;
 
         return jpaQueryFactory.delete(commentLike)
                 .where(commentLike.user.id.eq(userId),commentLike.comment.id.eq(commentId))
                 .execute();
+    }
+
+    @Override
+    public List<Long> getAllLikeByUser(Long userId) {
+        QCommentLike commentLike = QCommentLike.commentLike;
+
+        return jpaQueryFactory.select(commentLike.comment.id)
+                .from(commentLike)
+                .where(commentLike.user.id.eq(userId))
+                .fetch();
     }
 }
