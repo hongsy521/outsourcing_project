@@ -48,7 +48,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .where(post.user.id.in(followingIds))
                 .offset(offset)
                 .limit(5)
-                .orderBy(orderSpecifier)
+                .orderBy(orderSpecifier,post.user.username.asc())
                 .fetch();
 
         long total = jpaQueryFactory.selectFrom(post)
