@@ -5,7 +5,7 @@ import com.sparta.easyspring.auth.entity.User;
 import com.sparta.easyspring.auth.security.UserDetailsImpl;
 import com.sparta.easyspring.auth.security.UserDetailsServiceImpl;
 import com.sparta.easyspring.auth.util.JwtUtil;
-import com.sparta.easyspring.commentlike.repository.inf.CommentLikeRepositoryInterface;
+import com.sparta.easyspring.commentlike.repository.CommentLikeRepository;
 import com.sparta.easyspring.commentlike.service.CommentLikeService;
 import com.sparta.easyspring.config.MockSpringSecurityFilter;
 import com.sparta.easyspring.config.MockTestDataSetup;
@@ -59,7 +59,7 @@ class CommentLikeControllerTest{
     private CommentLikeService commentLikeService;
 
     @MockBean
-    CommentLikeRepositoryInterface commentLikeRepository;
+    CommentLikeRepository commentLikeRepository;
 
     @MockBean
     UserDetailsServiceImpl userDetailsServiceImpl;
